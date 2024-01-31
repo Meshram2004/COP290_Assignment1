@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Options Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function updateInputBoxes() {
+            var checkedFilters = document.querySelectorAll('input[name="filter"]:checked');
+            var inputContainer = document.getElementById('inputContainer');
+            inputContainer.innerHTML = ''; // Clear previous input boxes
+
+            for (var i = 0; i < checkedFilters.length; i++) {
+                var input = document.createElement('input');
+                input.type = 'number';
+                input.name = 'dynamicInput';
+                input.placeholder = 'Enter value for ' + checkedFilters[i].value;
+                inputContainer.appendChild(input);
+            }
+        }
+
+        function filterStocks() {
+            var selectedFilters = document.querySelectorAll('input[name="filter"]:checked');
+            var selectedStocks = document.querySelectorAll('input[name="stock"]:checked');
+            var inputValues = document.getElementsByName('dynamicInput');
+
+            // Prepare data to send to Flask
+            var data = {
+                filters: [],
+                stocks: [],
+                values: []
+            };
+
+            selectedFilters.forEach(filter => {
+                data.filters.push(filter.value);
+            });
+
+            selectedStocks.forEach(stock => {
+                data.stocks.push(stock.value);
+            });
+
+            inputValues.forEach(input => {
+                data.values.push(parseFloat(input.value));
+            });
+
+            // Send data to Flask using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/filter_stocks',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    // Handle the filtered stocks received from Flask
+                    console.log('Filtered Stocks:', response);
+
+                    // Update your UI with the filtered stocks
+                    var filteredStocksContainer = document.getElementById('filteredStocksContainer');
+                    filteredStocksContainer.innerHTML = ''; // Clear previous results
+
+                    if (response.length > 0) {
+                        // If there are filtered stocks, create a list and display them
+                        var ul = document.createElement('ul');
+
+                        response.forEach(function(stock) {
+                            var li = document.createElement('li');
+                            li.textContent = stock.symbol + ': ' + stock.value;
+                            ul.appendChild(li);
+                        });
+
+                        filteredStocksContainer.appendChild(ul);
+                    } else {
+                        // Display a message when there are no filtered stocks
+                        filteredStocksContainer.textContent = 'No stocks meet the criteria.';
+                    }
+                },
+
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Select Filters</h1>
+
+    <!-- Family 1: Filters -->
+    <form id="filterForm">
+        <fieldset>
+            <legend>Filters:</legend>
+            <label><input type="radio" name="filter" value="filter1" onchange="updateInputBoxes()"> Close</label>
+            <label><input type="radio" name="filter" value="filter2" onchange="updateInputBoxes()"> Open</label>
+            <label><input type="radio" name="filter" value="filter3" onchange="updateInputBoxes()"> Close</label>
+            <!-- Add more options as needed -->
+        </fieldset>
+
+        <!-- Input Boxes Container -->
+        <div id="inputContainer"></div>
+
+        <br>
+
+        <h1>Select Stocks</h1>
+
+        <!-- Family 2: Stocks -->
+        <fieldset>
+            <legend>Stocks:</legend>
+            <label><input type="checkbox" id="selectAllStocks" onchange="toggleSelectAll(this)"> Select All</label>
+            <label><input type="checkbox" name="stock" value="BRITANNIA.NS">BRITANNIA</label>
+            <label><input type="checkbox" name="stock" value="TITAN.NS">TITAN</label>
+            <label><input type="checkbox" name="stock" value="LT.NS">LT</label>
+            <label><input type="checkbox" name="stock" value="ONGC.NS">ONGC</label>
+            <label><input type="checkbox" name="stock" value="HEROMOTOCO.NS">HEROMOTOCO</label>
+            <label><input type="checkbox" name="stock" value="ULTRACEMCO.NS">ULTRACEMCO</label>
+            <label><input type="checkbox" name="stock" value="ADANIENT.NS">ADANIENT</label>
+            <label><input type="checkbox" name="stock" value="HINDALCO.NS">HINDALCO</label>
+            <label><input type="checkbox" name="stock" value="BAJFINANCE.NS">BAJFINANCE</label>
+            <label><input type="checkbox" name="stock" value="HDFCLIFE.NS">HDFCLIFE</label>
+            <label><input type="checkbox" name="stock" value="APOLLOHOSP.NS">APOLLOHOSP</label>
+            <!-- Add more options as needed -->
+        </fieldset>
+
+        <br>
+
+        <input type="button" value="Submit" onclick="filterStocks()">
+    </form>
+
+    <!-- Add this div in your HTML to display filtered stocks -->
+    <div id="filteredStocksContainer"></div>
+
+
+</body>
+</html>
