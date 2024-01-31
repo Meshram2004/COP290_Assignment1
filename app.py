@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from jugaad_data.nse import stock_csv, stock_df
 from datetime import datetime, timedelta,date,time
 import pandas as pd
+import plotly.express as px
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with your actual secret key
@@ -82,6 +84,39 @@ def stock_analysis():
             #true an additional column of kind-of-serial-nums is created 
             Details_required.to_csv(csv_path, index=False)
 
+        if csv_path:
+                # Your logic to read the CSV file and perform further actions
+                df = pd.read_csv(csv_path)
+
+                # Plotting
+                # plt.figure(figsize=(10, 5))
+
+                if selected_analysis_type == 'Market Price':
+                    selected_analysis_type = 'CLOSE'
+                    # plt.plot(df['DATE'],df['CLOSE'], label='Market Price')
+                elif selected_analysis_type == 'Value':
+                    selected_analysis_type = 'VALUE'
+                    # plt.plot(df['DATE'],df['VALUE'], label='Value')
+                elif selected_analysis_type == 'LTP':
+                    selected_analysis_type = 'LTP'
+                    # plt.plot(df['DATE'], df['LTP'], label='LTP')
+
+                
+                fig = px.line(Details_required, x='DATE', y=selected_analysis_type, title=f'{selected_stock} Stock Performance')
+                fig.update_xaxes(title_text='Date')
+                fig.update_yaxes(title_text=selected_analysis_type)
+                fig.update_layout(hovermode='x unified')  # Enable hover information for x-axis
+
+                fig.update_layout(plot_bgcolor='rgb(0, 0, 0)', paper_bgcolor='rgb(211, 211, 211)')
+
+                html_filename = "analysis.html"
+                html_path = os.path.join(os.path.dirname(__file__), 'static', html_filename)
+                fig.write_html(html_path)
+            
+
+                return render_template('stock_analysis.html', stocks=stocks, analysis_types=analysis_types,time_scale=time_scale, plot_html_path=html_path,html_filename=html_filename)
+
+    return render_template('stock_analysis.html', stocks=stocks, analysis_types=analysis_types, time_scale=time_scale)
 
 
 @app.route('/register', methods=['GET', 'POST'])
