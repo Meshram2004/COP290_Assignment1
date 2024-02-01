@@ -23,48 +23,24 @@ with app.app_context():
 
 def get_stock_value(stock_symbol, filter_type):
     try:
-        # Get historical data for the stock
-        stock_data = yf.download(stock_symbol, start='2024-01-01', end='2024-01-20')
-        
-        # Perform filtering based on filter_type
+        stock_data = yf.Ticker(stock_symbol + ".NS")
         if filter_type == 'filter1':
-            # Your filtering logic for filter1 (e.g., use close prices)
-            filtered_data = stock_data['Close']
+            filtered_data = stock_data.info.get('trailingPE')
+            print("hifilter 1")
         elif filter_type == 'filter2':
-            # Your filtering logic for filter2
-            # Replace this with your actual filtering logic based on the filter_type
-            filtered_data = stock_data['Open']
+            print("hifilter 2 before")
+            filtered_data = stock_data.info.get('returnOnAssets')
+            print("hifilter 2 after")
         else:
-            # Default to close prices if filter_type is unknown
-            filtered_data = stock_data['Close']
+            filtered_data = stock_data.info.get('netIncome')
         
-        # Check if filtered_data is not empty
-        if not filtered_data.empty:
-            # Return the last value in the filtered data
-            last_value = filtered_data.iloc[-1]
-            return last_value
+        if filtered_data is not None:
+            return filtered_data
         else:
-            # Handle the case when filtered_data is empty
             return None
     except Exception as e:
         print(f"Error fetching data for {stock_symbol}: {str(e)}")
-        # Return a default value or handle the error appropriately
         return None
-
-
-@app.route('/filter_stocks', methods=['POST'])
-def filter_stocks():
-    data = request.get_json()
-    print("hi")
-    filtered_stocks = []
-    print(data['stocks'])
-    for stock_symbol in data['stocks']:
-        stock_value = get_stock_value(stock_symbol, data['filters'][0])  # Assuming only one filter for simplicity
-        if stock_value > data['values'][0]:
-            filtered_stocks.append({"symbol": stock_symbol, "value": stock_value})
-
-    return jsonify(filtered_stocks)
-
 
 @app.route('/')
 def index():
@@ -113,8 +89,37 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
-@app.route('/Filters')
+@app.route('/Filters', methods=['GET', 'POST'])
 def Filters():
+    if request.method == 'POST':
+        filters = request.form.getlist('filter')
+        stocks = request.form.getlist('stock')
+        values = request.form.getlist('dynamicInput')
+        print(filters)
+        print(stocks)
+        print(values)
+        filtered_stocks = []
+
+        for stock_symbol in stocks:
+            stock_values = []
+            print("hi103")
+
+            for filter_type, filter_value in zip(filters, values):
+                filter_value = float(filter_value)
+                stock_value = get_stock_value(stock_symbol, filter_type)
+                print(stock_value)
+
+                if stock_value is not None and stock_value > filter_value:
+                    stock_values.append({"filter_type": filter_type, "value": stock_value})
+                    print(stock_values)
+
+                print("hi108")
+            if stock_values:
+                filtered_stocks.append({"symbol": stock_symbol, "values": stock_values})
+                print(filtered_stocks)
+
+        return render_template('Filters.html', filtered_stocks=filtered_stocks)
+
     return render_template('Filters.html')
 
 if __name__ == '__main__':
