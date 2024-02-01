@@ -1,31 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Analysis</title>
 
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css"
-    />
-
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script> -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" 
+     />
+     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
       body {
         margin: 0;
-        padding: 20px; /* Add padding to create space around the dropdown */
-        position: relative; /* Set the body position to relative for absolute positioning of elements */
-        background-image: url("/static/img8.jpg");
+        padding: 20px; /* for space around the dropdown */
+        position: relative; 
+        background-image: url("/static/img8.jpg"); /*setting the background image*/
         background-size: cover;
         background-position: center;
         height: 100vh;
@@ -51,20 +39,21 @@
             border: 3px solid #080808;
             padding: 20px;
             position: absolute;
-            top: 250px; /* Adjust top position */
-            left: 20px; /* Adjust left position */
+            top: 250px; 
+            left: 20px; 
             transition: ease-in;
         }
 
+        /* for label like 'Stock' , 'Criteria', 'Time scale' */
         label {
             margin-top: 65px;
             font-size: 24px; /* Increase font size */
             display:inline-block;
             margin-left: 30px;
-            /* background-color: #030303; */
             color:rgb(5, 247, 62);
-            /* border-radius: 8px; */
         }
+
+        /* for options wihin dropdown menu */
         select {
             border-radius: 10px;
             width: 150px;
@@ -76,6 +65,7 @@
             cursor:pointer;
         }
 
+        /* customizing the submit button */
         .go-button {
             position:absolute;
             background-color: #47f3e5; /* Change button color */
@@ -109,6 +99,7 @@
         }
 
         h2{
+          /* for setting the  */
           font-size: 7px; 
         font-weight: bold;
         font-style: italic;
@@ -132,17 +123,15 @@
         left: 15px;
         text-decoration: none;
         text-shadow: #1bc95b;
-        color: #060606; /* Set text color for contrast */
-        padding: 10px; /* Add padding for better visibility and clickability */
-        background-color: #fcfcfc; /* Add a background color for the button */
-        border-radius: 5px; /* Add border-radius for rounded corners */
+        color: #060606; 
+        padding: 10px; 
+        background-color: #fcfcfc; /* background color of button */
+        border-radius: 5px; /* for smooth corners */
         text-align: center;
         display: inline-block;
         font-size: 18px;
         font-weight: bold;
-        /* position: absolute; */
         bottom:390px;
-        /* right: 150px; */
         margin-bottom: 15px;
       }
 
@@ -151,33 +140,18 @@
         cursor: pointer;
       }
 
-      .logout-button {
-        position: absolute;
-        top: 20px; /* Adjust top position to move the button to the top */
-        right: 40px; /* Adjust right position to move the button to the right */
-        text-decoration: none;
-        color: #090808; /* Set text color for contrast */
-        padding: 15px; /* Add padding for better visibility and clickability */
-        background-color: #bfed38; /* Add a background color for the button */
-        border: none;
-        border-radius: 5px; /* Add border-radius for rounded corners */
-        font-weight: bold;
-      }
-
       .image-container {
-            text-align: center; /* Center-align content */
-            margin-top: 20px; /* Adjust top margin for spacing */
+            text-align: center; 
+            margin-top: 20px; /* top margin for better spacing */
             position: absolute;
             top: 10px;
             left:30px;
         }
 
-        /* Add style for the image */
+        /*setting the size of the image */
         .welcome-image {
             width: 180px; /* Adjust width as needed */
             height: 120px; /* Adjust height as needed */
-
-
         }
 
     </style>
@@ -202,7 +176,6 @@
         <option value="{{ analysis_type }}">{{ analysis_type }}</option>
         {% endfor %}
       </select>
-      <!-- <br /> -->
 
       <label for="time">Time Scale:</label>
       <select id="time" name="time">
@@ -210,30 +183,21 @@
         <option value="{{ time_scale }}">{{ time_scale }}</option>
         {% endfor %}
       </select>
-      <!-- <br /> -->
 
       <button class="go-button" type="submit">Go</button>
-      <!-- <input type="submit" value="Go" /> -->
-
-      <!-- {% if plot_filename %}
-        <h2>Analysis Plot</h2>
-        <img src="{{ url_for('static', filename=plot_filename) }}" alt="Analysis Plot">
-        {% endif %} -->
+    
       {% if plot_html_path %}
       <h2>Performance Plot</h2>
-      <!-- {plot_filename=f"{stock}_analysis.html"} -->
       <iframe
         src="{{ url_for('static', filename = html_filename) }}" width="1100px"  height="600px" ></iframe>
       {% endif %}
     </form>
     <div class="buttons-container">
-      <!-- <a class="button-item" href="/stock_analysis">Stock Performance</a> -->
       <a class="button-item" href="/multiple_stocks">Multiple Stocks Stats</a>
-      <a class="button-item" href="/filter_choose">Filter and Choose</a>
+      <a class="button-item" href="/Filters">Filter and Choose</a>
     </div>
 
     <div class="image-container">
-      <!-- Replace 'your_image.jpg' with the actual path to your image file -->
       <img id="welcome-image" class="welcome-image" src="{{ url_for('static', filename='logo.png') }}" alt="Welcome Image">
     </div>
 
